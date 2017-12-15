@@ -40,4 +40,12 @@ class AnimTextView(ctx:Context):View(ctx) {
             canvas.restore()
         }
     }
+    data class TextRect(var x:Float,var y:Float,var w:Float,var h:Float) {
+        fun draw(canvas:Canvas,paint:Paint,scale:Float) {
+            paint.color = Color.parseColor("#4527A0")
+            canvas.save()
+            canvas.drawRoundRect(RectF(x,y,x+w*scale,y+h),w/10,h/2,paint)
+            canvas.restore()
+        }
+    }
 }
