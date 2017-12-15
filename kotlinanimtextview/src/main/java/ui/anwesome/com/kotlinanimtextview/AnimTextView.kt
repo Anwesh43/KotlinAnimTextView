@@ -13,10 +13,14 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 class AnimTextView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    var onOpenCloseListener:OnOpenCloseListener?=null
     var texts:LinkedList<String> = LinkedList()
     val renderer = TextContainerRenderer(this)
     fun addText(text:String) {
         texts.add(text)
+    }
+    fun addOnOpenCloseListener(onOpenListener:()->Unit,onCloseListener: () -> Unit) {
+        onOpenCloseListener = OnOpenCloseListener(onOpenListener,onCloseListener)
     }
     override fun onDraw(canvas:Canvas) {
         renderer.draw(canvas,paint)
@@ -114,8 +118,12 @@ class AnimTextView(ctx:Context):View(ctx) {
         var animated = false
         fun update() {
             if(animated) {
-                container.update{
+                container.update{ scale ->
                     animated = false
+                    when(scale) {
+                        0f -> view.onOpenCloseListener?.onCloseListener?.invoke()
+                        1f -> view.onOpenCloseListener?.onOpenListener?.invoke()
+                    }
                 }
                 try {
                     Thread.sleep(50)
@@ -169,6 +177,9 @@ class AnimTextView(ctx:Context):View(ctx) {
                 view?.addText(text)
             }
         }
+        fun addOnOpenCloseListener(onOpenListener: () -> Unit,onCloseListener: () -> Unit) {
+            view?.onOpenCloseListener = OnOpenCloseListener(onOpenListener,onCloseListener)
+        }
         fun show(activity: Activity) {
             if(!shown) {
                 activity.setContentView(view)
@@ -176,4 +187,5 @@ class AnimTextView(ctx:Context):View(ctx) {
             }
         }
     }
+    data class OnOpenCloseListener(var onOpenListener:()->Unit,var onCloseListener:()->Unit)
 }
