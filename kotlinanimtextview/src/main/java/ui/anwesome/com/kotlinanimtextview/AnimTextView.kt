@@ -56,6 +56,7 @@ class AnimTextView(ctx:Context):View(ctx) {
     }
     data class TextRectContainer(var w:Float,var h:Float,var texts:Array<String>) {
         var textRects:ConcurrentLinkedQueue<TextRect> = ConcurrentLinkedQueue()
+        val state = TextContainerState()
         var button:TextContainerButton?=null
         init {
             var n = (texts.size)/2
@@ -74,15 +75,15 @@ class AnimTextView(ctx:Context):View(ctx) {
         }
         fun draw(canvas:Canvas,paint:Paint) {
             textRects.forEach { textRect ->
-                textRect.draw(canvas,paint,1f)
+                textRect.draw(canvas,paint,state.scale)
             }
-            button?.draw(canvas,paint,1f)
+            button?.draw(canvas,paint,state.scale)
         }
         fun update(stopcb:(Float)->Unit) {
-
+            state.update(stopcb)
         }
         fun startUpdating(startcb:()->Unit) {
-
+            state.startUpdating(startcb)
         }
     }
     data class TextContainerState(var scale:Float = 0f,var dir:Float = 0f,var prevScale:Float = 0f) {
