@@ -16,13 +16,19 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class AnimTextView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var texts:LinkedList<String> = LinkedList()
+    val renderer = TextContainerRenderer(this)
     fun addText(text:String) {
         texts.add(text)
     }
     override fun onDraw(canvas:Canvas) {
-
+        renderer.draw(canvas,paint)
     }
     override fun onTouchEvent(event:MotionEvent):Boolean {
+        when(event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                renderer.startUpdating()
+            }
+        }
         return true
     }
     data class TextContainerButton(var x:Float,var y:Float,var r:Float) {
