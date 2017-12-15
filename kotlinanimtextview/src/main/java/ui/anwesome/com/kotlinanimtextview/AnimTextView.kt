@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
@@ -14,8 +15,9 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 class AnimTextView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    var texts:LinkedList<String> = LinkedList()
     fun addText(text:String) {
-
+        texts.add(text)
     }
     override fun onDraw(canvas:Canvas) {
 
@@ -54,7 +56,7 @@ class AnimTextView(ctx:Context):View(ctx) {
             canvas.restore()
         }
     }
-    data class TextRectContainer(var w:Float,var h:Float,var texts:Array<String>) {
+    data class TextRectContainer(var w:Float,var h:Float,var texts:LinkedList<String>) {
         var textRects:ConcurrentLinkedQueue<TextRect> = ConcurrentLinkedQueue()
         val state = TextContainerState()
         var button:TextContainerButton?=null
@@ -127,6 +129,24 @@ class AnimTextView(ctx:Context):View(ctx) {
                     view.postInvalidate()
                 }
             }
+        }
+    }
+    data class TextContainerRenderer(var view:AnimTextView) {
+        var time = 0
+        var animator:TextContainerAnimator?=null
+        fun draw(canvas:Canvas,paint:Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                animator = TextContainerAnimator(TextRectContainer(w,h,view.texts),view)
+            }
+            canvas.drawColor(Color.parseColor("#212121"))
+            animator?.draw(canvas,paint)
+            animator?.update()
+            time++
+        }
+        fun startUpdating() {
+            animator?.startUpdating()
         }
     }
 }
