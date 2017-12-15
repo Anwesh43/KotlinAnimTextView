@@ -1,5 +1,6 @@
 package ui.anwesome.com.kotlinanimtextview
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -153,6 +154,26 @@ class AnimTextView(ctx:Context):View(ctx) {
         }
         fun startUpdating() {
             animator?.startUpdating()
+        }
+    }
+    companion object {
+        var view:AnimTextView?=null
+        var shown = false
+        fun create(activity:Activity) {
+            if(!shown) {
+                view = AnimTextView(activity)
+            }
+        }
+        fun addText(text:String) {
+            if(!shown) {
+                view?.addText(text)
+            }
+        }
+        fun show(activity: Activity) {
+            if(!shown) {
+                activity.setContentView(view)
+                shown = true
+            }
         }
     }
 }
