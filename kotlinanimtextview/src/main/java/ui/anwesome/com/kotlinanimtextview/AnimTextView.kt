@@ -67,6 +67,7 @@ class AnimTextView(ctx:Context):View(ctx) {
                 x += w/2
                 if(x > w) {
                     x = w/10
+                    y += 2*hGap
                 }
             }
             button = TextContainerButton(w/2,h/5,h/15)
@@ -82,6 +83,21 @@ class AnimTextView(ctx:Context):View(ctx) {
         }
         fun startUpdating(startcb:()->Unit) {
 
+        }
+    }
+    data class TextContainerState(var scale:Float = 0f,var dir:Float = 0f,var prevScale:Float = 0f) {
+        fun update(stopcb:(Float)->Unit) {
+            scale += dir*0.1f
+            if(Math.abs(scale - prevScale) > 1f) {
+                scale = prevScale + dir
+                dir = 0f
+                prevScale = scale
+                stopcb(scale)
+            }
+        }
+        fun startUpdating(startcb:()->Unit) {
+            dir = 1f-2*scale
+            startcb()
         }
     }
 }
