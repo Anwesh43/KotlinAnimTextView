@@ -2,10 +2,7 @@ package ui.anwesome.com.kotlinanimtextview
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import android.view.MotionEvent
 import android.view.View
 import java.util.*
@@ -41,6 +38,7 @@ class AnimTextView(ctx:Context):View(ctx) {
             paint.strokeCap = Paint.Cap.ROUND
             paint.color = Color.parseColor("#1565C0")
             canvas.drawCircle(0f,0f,r,paint)
+            paint.color = Color.WHITE
             for(i in 0..1) {
                 canvas.save()
                 canvas.rotate(90f*i)
@@ -55,7 +53,9 @@ class AnimTextView(ctx:Context):View(ctx) {
             paint.color = Color.parseColor("#4527A0")
             canvas.save()
             canvas.translate(x+w/2,y+h/2)
-            canvas.scale(scale,1f)
+            val path = Path()
+            path.addRect(RectF(-w/2*scale,-h/2,w/2*scale,h/2),Path.Direction.CW)
+            canvas.clipPath(path)
             canvas.drawRoundRect(RectF(-w/2,-h/2,w/2,h/2),w/10,h/2,paint)
             paint.textSize = h/3
             paint.color = Color.WHITE
@@ -68,12 +68,12 @@ class AnimTextView(ctx:Context):View(ctx) {
         val state = TextContainerState()
         var button:TextContainerButton?=null
         init {
-            var n = (texts.size)/2
+            var n = (texts.size)/2 + (texts.size)%2
             val hGap = (3*h/5)/(2*n+1)
             var y = 2*h/5 + 3*hGap/2
             var x = w/10
             texts.forEach { text ->
-                textRects.add(TextRect(x,y,2*w/5,h,text))
+                textRects.add(TextRect(x,y,2*w/5,hGap,text))
                 x += w/2
                 if(x > w) {
                     x = w/10
