@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
+import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * Created by anweshmishra on 15/12/17.
@@ -40,12 +41,47 @@ class AnimTextView(ctx:Context):View(ctx) {
             canvas.restore()
         }
     }
-    data class TextRect(var x:Float,var y:Float,var w:Float,var h:Float) {
+    data class TextRect(var x:Float,var y:Float,var w:Float,var h:Float,var text:String) {
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             paint.color = Color.parseColor("#4527A0")
             canvas.save()
-            canvas.drawRoundRect(RectF(x,y,x+w*scale,y+h),w/10,h/2,paint)
+            canvas.translate(x+w/2,y+h/2)
+            canvas.scale(scale,1f)
+            canvas.drawRoundRect(RectF(-w/2,-h/2,w/2,h/2),w/10,h/2,paint)
+            paint.textSize = h/3
+            paint.color = Color.WHITE
+            canvas.drawText(text,-paint.measureText(text)/2,paint.textSize/2,paint)
             canvas.restore()
+        }
+    }
+    data class TextRectContainer(var w:Float,var h:Float,var texts:Array<String>) {
+        var textRects:ConcurrentLinkedQueue<TextRect> = ConcurrentLinkedQueue()
+        var button:TextContainerButton?=null
+        init {
+            var n = (texts.size)/2
+            val hGap = (3*h/5)/(2*n+1)
+            var y = 2*h/5 + 3*hGap/2
+            var x = w/10
+            texts.forEach { text ->
+                textRects.add(TextRect(x,y,2*w/5,h,text))
+                x += w/2
+                if(x > w) {
+                    x = w/10
+                }
+            }
+            button = TextContainerButton(w/2,h/5,h/15)
+        }
+        fun draw(canvas:Canvas,paint:Paint) {
+            textRects.forEach { textRect ->
+                textRect.draw(canvas,paint,1f)
+            }
+            button?.draw(canvas,paint,1f)
+        }
+        fun update(stopcb:(Float)->Unit) {
+
+        }
+        fun startUpdating(startcb:()->Unit) {
+
         }
     }
 }
